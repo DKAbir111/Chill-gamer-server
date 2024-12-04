@@ -4,10 +4,12 @@ const router = express.Router()
 
 const createUserRouter = (userCollection) => {
 
-    router.get('/users', (req, res) => {
-        res.send('Get users route')
+    router.post('/users', async (req, res) => {
+        const newUser = req.body;
+        const result = await userCollection.insertOne(newUser);
+        res.send(result)
     })
-    console.log(userCollection)
+
     return router;
 }
 
