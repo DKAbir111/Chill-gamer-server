@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 require('dotenv').config();
+const createUserRouter = require('./routes/user.route.js');
 
 const port = process.env.PORT || 5001
 //middleware
@@ -27,10 +28,17 @@ const client = new MongoClient(uri, {
     }
 });
 
+
+
+
 async function run() {
+    const database = client.db('ChillGamer')
+    const userCollection = database.collection('UserCollection')
     try {
         // Connect the client to the server	(optional starting in v4.7)
         await client.connect();
+        //calling user routes
+        app.use(createUserRouter(userCollection))
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
