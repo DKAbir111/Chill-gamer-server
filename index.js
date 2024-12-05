@@ -18,7 +18,6 @@ app.get('/', (req, res) => {
 
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.xratx.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
-console.log(uri);
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -34,13 +33,14 @@ async function run() {
     const database = client.db('ChillGamer')
     const userCollection = database.collection('UserCollection')
     const gameCollection = database.collection('gameCollection')
+    const watchCollection = database.collection('watchCollection')
     try {
         // Connect the client to the server	(optional starting in v4.7)
         await client.connect();
         //calling user routes
         app.use(createUserRouter(userCollection))
         //calling game routes
-        app.use(createGameRouter(gameCollection))
+        app.use(createGameRouter(gameCollection, watchCollection))
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
@@ -50,8 +50,6 @@ async function run() {
     }
 }
 run().catch(console.dir);
-
-
 app.listen(port, () => [
     console.log(`Server is running on port ${port}`)
 ]);
