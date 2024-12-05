@@ -28,18 +28,19 @@ const createGameRoute = (gameCollection, watchCollection) => {
         const id = req.params.id;
         const query = { _id: new ObjectId(id) }
         const result = await gameCollection.findOne(query)
-        if (result.length === 0) {
-            return res.status(404).send({ message: "No reviews found for this email." });
-        }
         res.send(result);
     })
 
     //update review by id
     router.put('/update/:id', async (req, res) => {
         const id = req.params.id;
+
+        if (!ObjectId.isValid(id)) {
+            return res.status(400).send({ error: 'Invalid ID format' });
+        }
+
         const review = req.body;
         const filter = { _id: new ObjectId(id) };
-        const options = { upsert: true };
         const updateDoc = {
             $set: {
                 review: review.review,
@@ -47,15 +48,26 @@ const createGameRoute = (gameCollection, watchCollection) => {
                 email: review.email,
                 cover: review.cover,
                 genre: review.genre,
-                year: review.year
-
+                year: review.year,
             },
         };
-        const result = await gameCollection.updateOne(filter, updateDoc, options);
+
+        try {
+            const result = await gameCollection.updateOne(filter, updateDoc);
+            res.send(result);
+        } catch (error) {
+            console.error(error);
+            res.status(500).send({ error: 'Failed to update the review' });
+        }
+    });
+
+    //delete review by user
+    router.delete('/review/:id', async (req, res) => {
+        const id = req.params.id;
+        const query = { _id: new ObjectId(id) };
+        const result = await gameCollection.deleteOne(query);
         res.send(result);
-
     })
-
 
     //Add watch collection list
     router.post('/watchlist', async (req, res) => {
