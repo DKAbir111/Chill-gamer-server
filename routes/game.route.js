@@ -19,6 +19,28 @@ const createGameRoute = (gameCollection, watchCollection) => {
         const data = await gameCollection.findOne(query);
         res.send(data);
     })
+    //get add review by email
+    router.get('/reviews/:email', async (req, res) => {
+        const email = req.params.email;
+        const result = await gameCollection.find({ email }).toArray();
+        if (result.length === 0) {
+            return res.status(404).send({ message: "No reviews found for this email." });
+        }
+        res.send(result);
+    })
+
+    //find review by id
+    router.get('/review/:id', async (req, res) => {
+        const id = req.params.id;
+        const query = { _id: new ObjectId(id) }
+        const result = await gameCollection.findOne(query)
+        if (result.length === 0) {
+            return res.status(404).send({ message: "No reviews found for this email." });
+        }
+        res.send(result);
+    })
+
+
 
     //Add watch collection list
     router.post('/watchlist', async (req, res) => {
@@ -39,6 +61,17 @@ const createGameRoute = (gameCollection, watchCollection) => {
             res.status(500).send({ message: "An error occurred while adding to the watchlist." });
         }
     });
+    //find watch collection list by email address
+    router.get('/watchlist/:email', async (req, res) => {
+        const email = req.params.email;
+        const result = await watchCollection.find({ email }).toArray()
+        if (result.length === 0) {
+            return res.status(404).send({ message: "No items found in the watchlist for this email." });
+        }
+        res.send(result);
+    })
+
+
 
     return router;
 }
