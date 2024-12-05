@@ -13,12 +13,6 @@ const createGameRoute = (gameCollection, watchCollection) => {
         res.send(games);
     })
 
-    router.get('/review/:id', async (req, res) => {
-        const id = req.params.id;
-        const query = { _id: new ObjectId(id) }
-        const data = await gameCollection.findOne(query);
-        res.send(data);
-    })
     //get add review by email
     router.get('/reviews/:email', async (req, res) => {
         const email = req.params.email;
@@ -40,6 +34,27 @@ const createGameRoute = (gameCollection, watchCollection) => {
         res.send(result);
     })
 
+    //update review by id
+    router.put('/update/:id', async (req, res) => {
+        const id = req.params.id;
+        const review = req.body;
+        const filter = { _id: new ObjectId(id) };
+        const options = { upsert: true };
+        const updateDoc = {
+            $set: {
+                review: review.review,
+                rating: review.rating,
+                email: review.email,
+                cover: review.cover,
+                genre: review.genre,
+                year: review.year
+
+            },
+        };
+        const result = await gameCollection.updateOne(filter, updateDoc, options);
+        res.send(result);
+
+    })
 
 
     //Add watch collection list
