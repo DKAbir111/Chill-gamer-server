@@ -45,7 +45,7 @@ const createGameRoute = (gameCollection, watchCollection) => {
             $set: {
                 review: review.review,
                 rating: review.rating,
-                email: review.email,
+                title: review.title,
                 cover: review.cover,
                 genre: review.genre,
                 year: review.year,
@@ -75,7 +75,7 @@ const createGameRoute = (gameCollection, watchCollection) => {
 
         try {
             const existingData = await watchCollection.findOne({
-                _id: newData._id,
+                insertedId: newData.insertedId,
                 email: newData.email
             });
             if (existingData) {
